@@ -90,4 +90,43 @@ def agrupar(sites):
 
 #processamento de massivas
 if st.button("Processar", type="primary"):
-    st.write(agrupar(parse_sites(lista_sites)))
+    grupos = agrupar(parse_sites(lista_sites))
+    massivas = [grupo for grupo in grupos if len(grupo) >= 3] # se o grupo de sites em grupos for maior ou = 3 sites, adiciona nas massivas
+    pares = [grupo for grupo in grupos if len(grupo) == 2] # se o grupo de sites em grupos for = 2 sites, adiciona nos pares
+    individuais = [grupo for grupo in grupos if len(grupo) == 1] # sites sem grupo
+    nao_massivas = pares + individuais
+
+    st.markdown("""
+    <style>
+    [data-testid="stMetric"] {
+        background-color: #1e1e2e;
+        border-radius: 8px;
+        padding: 16px;
+        border: 1px solid #333;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Massivas", len(massivas))
+    c2.metric("Pares", len(pares))
+    c3.metric("Individuais", len(individuais))
+
+    #Card para exibir massivas
+    st.subheader("Massivas")
+    with st.expander(f"Massivas"):
+        for grupo in massivas: # percorre os grupos de massivas
+            mestre = grupo[0]
+            filhos = grupo[1:]
+            with st.expander(f"INEP Mestre: {mestre['inep']}"):
+                nota = "POSSÍVEL MASSIVA\nINEPS AFETADOS:\n"
+                nota += "\n".join([filho['inep'] for filho in filhos]) #junta os filhos na nota com .join colocando quebra de linhas
+                st.code(nota)
+
+    st.subheader("Abrir Chamado")
+    with st.expander("Abrir Chamado"):
+        for grupo in nao_massivas:
+            for site in grupo:
+                st.write("INEP")
+                st.code(site['inep'])
+                
+    
