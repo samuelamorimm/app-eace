@@ -32,7 +32,7 @@ def parse_sites(texto):
         site['tempo_off'] = tempo_off.group(1) if tempo_off else None
 
         tempo_off_min = parse_minutes(site['tempo_off'])
-        site['tempo_off_min'] = tempo_off_min
+        site['tempo_off_min'] = int(tempo_off_min)
 
         sites.append(site)
     
@@ -58,7 +58,36 @@ def parse_minutes(texto):
     min = d * 1440 + h * 60 + m
     return min
 
+def agrupar(sites):
+    usados = []
+    grupos = []
+
+    for i in range(len(sites)): # pega o indice
+        if i in usados: #verifica se está em usados
+            continue
+
+        grupo = [sites[i]] # cria um grupo com o site da vez
+
+        for j in range(i + 1, len(sites)): #aqui ocorre a comparação, vai comparar o restante com o site da vez
+            if j in usados: #se j já estiver em usados pula e compara o próximo
+                continue
+            
+            mesma_uf = sites[i]['uf'] == sites[j]['uf']
+            mesma_cidade = sites[i]['municipio'] == sites[j]['municipio']
+            minutos = abs(sites[i]['tempo_off_min'] - sites[j]['tempo_off_min']) <= 10
+
+            if mesma_cidade and mesma_uf and minutos: #se a comparação der certo adiciona o site j ao grupo do site i
+                grupo.append(sites[j]) # aqui adiciona o site j ao grupo do site i
+                usados.append(j) # aqui adciona o site j em usados, pois ele já faz parte de um grupo
+
+        #adiciona i em usados e grupo tratado nos grupos e vai comparar o próximo site
+        usados.append(i) 
+        grupos.append(grupo)
+    
+    return grupos # ao final do processo retorna os grupos
+
+
 
 #processamento de massivas
 if st.button("Processar", type="primary"):
-    st.write(parse_sites(lista_sites))
+    st.write(agrupar(parse_sites(lista_sites)))
