@@ -1,7 +1,7 @@
 import streamlit as st
 import re
 
-st.set_page_config(page_title="APP Eace", layout="centered")
+st.set_page_config(page_title="Massivas", layout="centered")
 st.title("Agrupador de Massivas")
 
 
@@ -117,16 +117,23 @@ if st.button("Processar", type="primary"):
         for grupo in massivas: # percorre os grupos de massivas
             mestre = grupo[0]
             filhos = grupo[1:]
-            with st.expander(f"INEP Mestre: {mestre['inep']}"):
+            with st.expander(f"{mestre['uf']} - {mestre['municipio']} | **{mestre['tempo_off']}**"):
                 nota = "POSSÍVEL MASSIVA\nINEPS AFETADOS:\n"
                 nota += "\n".join([filho['inep'] for filho in filhos]) #junta os filhos na nota com .join colocando quebra de linhas
+                
+                st.write("INEP MESTRE:")
+                st.code(mestre['inep'])
+                st.write("NOTA DA MASSIVA:")
                 st.code(nota)
 
     st.subheader("Abrir Chamado")
     with st.expander("Abrir Chamado"):
+        c1, c2 = st.columns(2)
         for grupo in nao_massivas:
             for site in grupo:
-                st.write("INEP")
-                st.code(site['inep'])
+                c1.write(f"INEP")
+                c1.code(site['inep'])
+                c2.write(f"{site['uf']} - {site['municipio']}")
+                c2.warning(f"OFF há {site['tempo_off']}")
                 
     
